@@ -1,0 +1,30 @@
+Singleton is easy understanding. I will not a full running and compilable CPP source code. Just list the key items.
+
+1. Constructor/Desctructor is private type.
+2. static private instance data member must be declared.
+3. static interface to get the static private instance data member.
+
+Below is the code example:
+
+Class CallMgntOutCallInProgressState : public CallMgntState
+{
+public:
+     static CallMgntOutCallInProgressState*    Instance();
+
+private:
+    CallMgntOutCallInProgressState()  {};
+   ~CallMgntOutCallInProgressState()  {};
+    static CallMgntOutCallInProgressState* m_callmgnt_state;
+}
+
+
+CallMgntOutCallInProgressState* CallMgntOutCallInProgressState::Instance()
+{
+    if (NULL == m_callmgnt_state)
+    {
+        m_callmgnt_state = new CallMgntOutCallInProgressState();
+    }
+
+    return m_callmgnt_state;
+}
+
