@@ -1,8 +1,8 @@
-Singleton is easy understanding. I will not a full running and compilable CPP source code. Just list the key items.
+Singleton is easy understanding. I will not create a full running and compilable CPP source code. Just list the key items.
 
-1. Constructor/Desctructor is private type.
+1. Constructor/Desctructor is private type. This is to avoid other code or application using new operator to create the class object.
 2. static private instance data member must be declared.
-3. static interface to get the static private instance data member.
+3. static interface to get the static private instance data member. Wherever to use the instance, just call the interface to get the object instance. No need to create a new one.
 
 Below is the code example:
 
