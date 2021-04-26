@@ -21,6 +21,7 @@
 using namespace std;
 
 // parent class of product
+// Abstract class, defines product common interface
 class product
 {
 public:
@@ -48,6 +49,7 @@ public:
     }
 };
 // Parent class definition -- creator
+// Abstract class, is responsible to define interface of factory method
 class creator
 {
 public:
@@ -68,6 +70,7 @@ public:
 };
 
 // 1 derived class of creator
+// Responsible for concrete product creation
 class creator1 : public creator
 {
 public:
@@ -81,6 +84,7 @@ public:
 
 
 // 2 derived class of creator
+// Responsible for concrete product creation
 class creator2 : public creator
 {
 public:
