@@ -1,6 +1,26 @@
 /*
-    Observer design pattern.
+    Observer design pattern is a behavior design pattern. 
 
+    In this design pattern, user can define a subscription mechanisiam that
+when a certain object have changes, it can notify all the objects that "observing" the certain object.
+
+    The typical example is that customer who want to buy the latest iPhone in Appls store.
+    1. Buyers want to know when the latest type can be reached.
+    2. They don't want to go to Apple store repeatedly for check.
+    3. Apple store can save their email or buyers subscribe the news
+    4. When the latest phone is being sold in Apple store, buyers who are subscribing will be noticed
+    5. The notification will not be sent to the buyers who did not subscribe.
+
+
+    How to realize?
+
+    1. Publisher has to maintain a list for all subscribers.
+
+    2. Publisher has method to add/delete subscribers.
+
+    3. Publisher has method to notify subscribers
+
+    4. When observers receive the notice, they need to do related update.
 */
 
 #include <iostream>
