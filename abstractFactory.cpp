@@ -1,3 +1,13 @@
+/*
+    Factory method design pattern is used factory method to create different type products (chair, soft,...).
+
+    Abstract factory design pattern is also user different factory methods to create concrete products (modernChair, classicChair, modernSofa, classicSofa), but the created types are
+    
+    abstract product types (chair, sofa,...).
+
+
+
+*/
 #include <iostream>
 #include <string>
 
