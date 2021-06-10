@@ -19,6 +19,10 @@
     Simple realization scenario,
 	client code creates strategy 1 -> set strategy via context  -> calling generic algorithm interface
 	client code creates strategy 2 -> set strategy via context  -> calling generic algorithm interface
+
+
+    
+    ACTUALLY, strategy design pattern can be realized via lambda expression.
 */
 #include <iostream>
 #include <string>
