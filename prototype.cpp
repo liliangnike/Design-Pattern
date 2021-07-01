@@ -105,5 +105,6 @@ int main()
     demo(fact);
     delete fact;
     fact = nullptr;
+
     return 0;
 }
