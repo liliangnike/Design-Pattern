@@ -32,3 +32,8 @@ This repo is for design pattern learning. It includes CPP programs of several de
    - Strategy
    - Template Method
    - Visitor
+
+4. NOTES.TXT
+   - Briefly comparison between 'Simple Factory', 'Factory Method' and 'Abstract Factory'
+   - Take 'KFC' as example
+   - Simple code was also given

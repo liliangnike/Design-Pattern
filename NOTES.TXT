@@ -1,0 +1,152 @@
+
+这份笔记为你整理好了。
+它采用了**“核心思想 + 优点/缺点 + 肯德基实战代码 + 调用示例”**的完整结构。你可以直接复制到你的 Markdown 笔记或者 Ubuntu 的 vi 编辑器里。
+
+📝 C++ 三大工厂模式完全笔记 (KFC 实战篇)
+
+1. 简单工厂模式 (Simple Factory)核心思想由一个中心工厂类根据传入的参数（如字符串、枚举），动态决定创建哪一种产品类的实例。它像一个“全能点餐机”。
+优点：客户端不需要知道创建产品的细节，只需要传一个参数，逻辑高度集中。
+缺点：违反开闭原则。每增加一个新产品（如增加“虾肉汉堡”），都必须修改工厂类的 if-else 代码。
+
+#include <iostream>
+#include <string>
+#include <memory>
+
+// 基类：汉堡
+class Burger { 
+public: 
+    virtual void info() = 0; 
+    virtual ~Burger() {} 
+};
+
+// 具体产品
+class BeefBurger : public Burger { 
+public: 
+    void info() override { std::cout << "【简单工厂】制作：牛肉汉堡\n"; } 
+};
+
+class ChickenBurger : public Burger { 
+public: 
+    void info() override { std::cout << "【简单工厂】制作：鸡肉汉堡\n"; } 
+};
+
+// 简单工厂类
+class KFCSimpleFactory {
+public:
+    static std::unique_ptr<Burger> createBurger(std::string type) {
+        if (type == "beef") return std::make_unique<BeefBurger>();
+        if (type == "chicken") return std::make_unique<ChickenBurger>();
+        return nullptr; // 没这口味
+    }
+};
+
+// --- 调用示例 ---
+int main_simple() {
+    // 用户只需知道工厂和名字
+    auto b1 = KFCSimpleFactory::createBurger("beef");
+    if (b1) b1->info();
+    return 0;
+}
+
+2. 工厂方法模式 (Factory Method)核心思想定义一个创建对象的接口（抽象工厂），但由子类工厂决定要实例化的类是哪一个。它将产品的创建延迟到子类。
+优点：符合开闭原则。增加新城市的分店（如“济南店”）不需要修改原有的工厂代码，只需新建一个济南工厂类。
+缺点：每增加一个产品，都要增加对应的具体工厂类，类数量会成倍增长，增加系统复杂性。
+
+// 抽象产品
+class Burger { public: virtual void info() = 0; virtual ~Burger() {} };
+
+// 具体产品：不同地域口味
+class JiNanBurger : public Burger { 
+public: void info() override { std::cout << "吃到了【济南分店】的汉堡\n"; } 
+};
+
+class QingDaoBurger : public Burger { 
+public: void info() override { std::cout << "吃到了【青岛分店】的汉堡\n"; } 
+};
+
+// 抽象工厂接口
+class KFCStore {
+public:
+    virtual std::unique_ptr<Burger> orderBurger() = 0;
+    virtual ~KFCStore() {}
+};
+
+// 济南店具体工厂
+class JiNanKFC : public KFCStore {
+public:
+    std::unique_ptr<Burger> orderBurger() override { return std::make_unique<JiNanBurger>(); }
+};
+
+// 青岛店具体工厂
+class QingDaoKFC : public KFCStore {
+public:
+    std::unique_ptr<Burger> orderBurger() override { return std::make_unique<QingDaoBurger>(); }
+};
+
+// --- 调用示例 ---
+int main_method() {
+    // 1. 选定去哪家分店
+    std::unique_ptr<KFCStore> myStore = std::make_unique<JiNanKFC>();
+    
+    // 2. 生产该分店特有的产品
+    auto myBurger = myStore->orderBurger();
+    myBurger->info();
+    return 0;
+}
+
+3. 抽象工厂模式 (Abstract Factory)核心思想提供一个接口，用于创建相关或依赖对象的家族（产品族），而不需要指明具体类。它不仅管汉堡，还管可乐。
+优点：确保同一产品族的对象（如济南汉堡 + 济南可乐）能一起使用，保证配套一致性。
+缺点：扩展产品族非常困难。如果你想在套餐里增加“薯条”，你需要修改抽象工厂接口以及所有的具体工厂子类。
+
+// 产品 A：汉堡类
+class Burger { public: virtual void info() = 0; virtual ~Burger() {} };
+class JNBurger : public Burger { public: void info() override { std::cout << "济南特色汉堡 "; } };
+class QDBurger : public Burger { public: void info() override { std::cout << "青岛海鲜汉堡 "; } };
+
+// 产品 B：可乐类
+class Cola { public: virtual void drink() = 0; virtual ~Cola() {} };
+class JNCola : public Cola { public: void drink() override { std::cout << "配 济南泉水可乐\n"; } };
+class QDCola : public Cola { public: void drink() override { std::cout << "配 崂山可乐\n"; } };
+
+// 抽象工厂：定义一个完整的“套餐清单”
+class KFCAbstractFactory {
+public:
+    virtual std::unique_ptr<Burger> createBurger() = 0;
+    virtual std::unique_ptr<Cola> createCola() = 0;
+    virtual ~KFCAbstractFactory() {}
+};
+
+// 济南店：实现济南套餐
+class JiNanKFCCombo : public KFCAbstractFactory {
+public:
+    std::unique_ptr<Burger> createBurger() override { return std::make_unique<JNBurger>(); }
+    std::unique_ptr<Cola> createCola() override { return std::make_unique<JNCola>(); }
+};
+
+// 青岛店：实现青岛套餐
+class QingDaoKFCCombo : public KFCAbstractFactory {
+public:
+    std::unique_ptr<Burger> createBurger() override { return std::make_unique<QDBurger>(); }
+    std::unique_ptr<Cola> createCola() override { return std::make_unique<QDCola>(); }
+};
+
+// --- 调用示例 ---
+int main_abstract() {
+    // 客户选定具体套餐品牌
+    std::unique_ptr<KFCAbstractFactory> kfc = std::make_unique<QingDaoKFCCombo>();
+
+    // 拿到互相关联的一整套产品
+    auto burger = kfc->createBurger();
+    auto cola = kfc->createCola();
+
+    burger->info();
+    cola->drink();
+
+    return 0;
+}
+
+总结对比表
+模式        核心层级        解决的问题                               复杂度
+简单工厂    一个类         隐藏创建细节，统一入口⭐                   (低)
+工厂方法    多个子工厂     解决“增加产品”时的代码修改冲突⭐⭐         (中)
+抽象工厂    多类产品族     解决多个产品之间的“配套和系列”问题⭐⭐⭐   (高)
