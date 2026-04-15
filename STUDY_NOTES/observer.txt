@@ -1,0 +1,115 @@
+在肯德基里，观察者模式最典型的场景就是：“疯狂星期四”的优惠通知。
+1. 生活中的例子：
+疯狂星期四想象一下：
+被观察者（Subject）：肯德基官方公众号。它手里有一份“粉丝名单”。
+观察者（Observers）：你、我、以及每一个想吃炸鸡的打工人。
+
+模式运行逻辑：
+我们（观察者）在公众号上点了“关注”（注册/订阅）。
+周四到了，肯德基公众号发布了“V我50”的优惠券（状态改变）。
+公众号查看名单，给所有关注的人群发推送（通知）。
+如果我们取消关注（注销），下次群发就没我们的份了。
+核心点：公众号不需要知道你是谁，它只需要知道你的“联系方式”在它的名单里。
+
+2. C++ 基本代码实现我们要定义两个基类：
+一个是“粉丝”接口，一个是“公众号”接口。
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+// 1. 抽象观察者：所有粉丝的基类
+class Customer {
+public:
+    virtual ~Customer() = default;
+    virtual void update(const std::string& message) = 0; // 收到通知后的反应
+};
+
+// 2. 抽象被观察者：公众号基类
+class KFCSubject {
+public:
+    virtual ~KFCSubject() = default;
+    // 关注
+    virtual void attach(Customer* observer) = 0;
+    // 取消关注
+    virtual void detach(Customer* observer) = 0;
+    // 群发通知
+    virtual void notify() = 0;
+};
+
+// 3. 具体的被观察者：肯德基官方公众号
+class KFCOfficialAccount : public KFCSubject {
+private:
+    std::vector<Customer*> _observers; // 粉丝名单
+    std::string _message;              // 推送内容
+
+public:
+    void attach(Customer* observer) override {
+        _observers.push_back(observer);
+    }
+
+    void detach(Customer* observer) override {
+        _observers.erase(std::remove(_observers.begin(), _observers.end(), observer), _observers.end());
+    }
+
+    void setNews(std::string news) {
+        _message = news;
+        std::cout << "--- 公众号更新内容: " << _message << " ---" << std::endl;
+        notify(); // 内容一变，立刻群发
+    }
+
+    void notify() override {
+        for (auto obs : _observers) {
+            obs->update(_message);
+        }
+    }
+};
+
+// 4. 具体的观察者：真实的食客
+class HungryGuy : public Customer {
+private:
+    std::string _name;
+public:
+    HungryGuy(std::string name) : _name(name) {}
+    void update(const std::string& message) override {
+        std::cout << _name << " 收到推送: [" << message << "], 准备出门 V 50!" << std::endl;
+    }
+};
+
+int main() {
+    KFCOfficialAccount kfcWA; // 肯德基公众号
+
+    HungryGuy g1("济南阿强");
+    HungryGuy g2("青岛小李");
+
+    // 关注公众号
+    kfcWA.attach(&g1);
+    kfcWA.attach(&g2);
+
+    // 到了周四
+    kfcWA.setNews("疯狂星期四：黄金鸡块 9.9 元！");
+
+    // 阿强不想听了，取消关注
+    kfcWA.detach(&g1);
+
+    // 再次推送
+    kfcWA.setNews("下周预告：吮指原味鸡买一赠一！");
+
+    return 0;
+}
+
+3. 深度解析：为什么这个模式牛？
+你可能会问：“我不就是一个循环调了一下函数吗？
+”它的精妙之处在于**“解耦”**（又见解耦！）：
+互不干扰：公众号不需要知道“济南阿强”是个什么样的人。它只知道阿强是一个 Customer，只要是 Customer 就一定有 update() 函数。
+动态性：粉丝可以随时来、随时走。公众号的代码不需要为了增加一个粉丝而重新编译。
+一对多：一个公众号的状态改变，可以瞬间联动 N 个粉丝的行为。
+
+4. 这里的坑：又是析构函数！还记得我们聊的 virtual 析构函数吗？
+在观察者模式里，Customer 是父类，如果你在销毁粉丝对象时，是通过 Customer* 指针来销毁的，如果 ~Customer() 不是 virtual 的，子类里的名字、资源等可能就没法正确清理。
+
+📊 总结
+    角色                    肯德基例子          核心职责
+Subject (被观察者)          公众号              维护名单、发送广播
+Observer (观察者)           粉丝（阿强/小李）   接收广播、执行动作
